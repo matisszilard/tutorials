@@ -1,0 +1,31 @@
+services:
+  mongo:
+    image: 'mongo:latest'
+    ports:
+      - 27017:27017
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: admin
+      MONGO_DB: test
+    volumes:
+      - my-data:/var/lib/mongodb/data
+      - ./mongo-entrypoint/:/docker-entrypoint-initdb.d/
+    networks:
+      - tutorials
+
+  mongo-exporter:
+    image: 'percona/mongodb_exporter:0.40.0'
+    environment:
+      MONGODB_URI: mongodb://myUser:myPassword@mongo:27017
+    command: ["--collect-all", "--compatible-mode", "--discovering-mode"]
+    ports:
+    - 9216:9216
+    networks:
+      - tutorials
+
+volumes:
+  my-data:
+
+networks:
+  tutorials:
+    external: true
