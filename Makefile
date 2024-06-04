@@ -41,3 +41,11 @@ start-prometheus: stop-prometheus
 .PHONY: stop-prometheus
 stop-prometheus:
 	docker-compose -f 4-prometheus/docker-compose.yml rm -s -f
+
+.PHONY: start-redis
+start-redis: stop-redis
+	docker-compose -f 5-redis/docker-compose.yml up -d
+
+.PHONY: stop-redis
+stop-redis:
+	docker-compose -f 5-redis/docker-compose.yml rm -s -f

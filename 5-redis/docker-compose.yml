@@ -1,0 +1,17 @@
+services:
+  redis:
+    image: redis:latest
+    ports:
+    - 6379:6379
+    networks:
+        - tutorials
+  redis-insight:
+    image: redis/redisinsight:latest
+    ports:
+    - 5540:5540
+    networks:
+        - tutorials
+
+networks:
+  tutorials:
+    external: true
