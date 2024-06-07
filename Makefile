@@ -49,3 +49,11 @@ start-redis: stop-redis
 .PHONY: stop-redis
 stop-redis:
 	docker-compose -f 5-redis/docker-compose.yml rm -s -f
+
+.PHONY: start-redis-grafana
+start-redis-grafana: stop-redis-grafana
+	docker-compose -f 6-redis-grafana/docker-compose.yml up -d
+
+.PHONY: stop-rediss-grafana
+stop-redis-grafana:
+	docker-compose -f 6-redis-grafana/docker-compose.yml rm -s -f
