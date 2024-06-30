@@ -1,0 +1,19 @@
+meta {
+  name: Create book
+  type: http
+  seq: 1
+}
+
+post {
+  url: http://localhost:3000/api/v1/books
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "title": "Lord of the rings",
+    "author": "J. R. R. Tolkien",
+    "year": "1965"
+  }
+}

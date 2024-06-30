@@ -1,0 +1,22 @@
+services:
+  mysql:
+    image: mysql:latest
+    restart: always
+    environment:
+      MYSQL_DATABASE: 'books'
+      MYSQL_USER: 'user'
+      MYSQL_PASSWORD: 'password'
+      MYSQL_ROOT_PASSWORD: 'password'
+    ports:
+      - '3306:3306'
+    volumes:
+      - books-db:/var/lib/mysql
+    networks:
+      - tutorials
+
+volumes:
+  books-db:
+
+networks:
+  tutorials:
+    external: true

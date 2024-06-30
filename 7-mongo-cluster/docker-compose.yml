@@ -1,0 +1,95 @@
+services:
+  router:
+    image: mongo:latest
+    container_name: mongo-router
+    command: |
+      mongos --port 27027 --configdb rs0/mongo1:27017,mongo2:27017,mongo2:27017 --bind_ip_all
+    ports:
+      - 27017:27017
+    networks:
+      - tutorials
+  
+  mongo1:
+    image: mongo:latest
+    hostname: mongo1
+    container_name: mongo1
+    ports:
+      - 27017:27017
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: admin
+    volumes:
+      - mongo-1-data:/var/lib/mongodb/data
+      # - ./mongo-entrypoint/:/docker-entrypoint-initdb.d/
+    entrypoint: ["mongod", "--replSet", "rs0", "--bind_ip", "mongo1"]
+    networks:
+      - tutorials
+
+  mongo2:
+    image: mongo:latest
+    hostname: mongo2
+    container_name: mongo2
+    ports:
+      - 27018:27017
+    volumes:
+      - mongo-2-data:/var/lib/mongodb/data
+      # - ./mongo-entrypoint/:/docker-entrypoint-initdb.d/
+    entrypoint: ["mongod", "--replSet", "rs0", "--bind_ip", "mongo2"]
+    networks:
+      - tutorials
+
+  mongo3:
+    image: mongo:latest
+    hostname: mongo3
+    container_name: mongo3
+    ports:
+      - 27019:27017
+    volumes:
+      - mongo-3-data:/var/lib/mongodb/data
+      # - ./mongo-entrypoint/:/docker-entrypoint-initdb.d/
+    entrypoint: ["mongod", "--replSet", "rs0", "--bind_ip", "mongo3"]
+    networks:
+      - tutorials
+
+  mongo-setup:
+    image: mongo:latest
+    depends_on:
+      - mongo1
+      - mongo2
+      - mongo3
+    volumes:
+      - ./scripts:/scripts
+    restart: "no"
+    entrypoint: [ "bash", "/scripts/mongo_setup.sh"]
+    networks:
+      - tutorials
+
+  mongo-express:
+    image: mongo-express
+    environment:
+        - ME_CONFIG_MONGODB_SERVER=mongo1
+        - ME_CONFIG_MONGODB_PORT=27017
+        - ME_CONFIG_MONGODB_ENABLE_ADMIN=true
+        - ME_CONFIG_MONGODB_AUTH_DATABASE=admin
+        - ME_CONFIG_MONGODB_ADMINUSERNAME=admin
+        - ME_CONFIG_MONGODB_ADMINPASSWORD=admin
+        # - ME_CONFIG_BASICAUTH_USERNAME=${MONGOEXPRESS_LOGIN}
+        # - ME_CONFIG_BASICAUTH_PASSWORD=${MONGOEXPRESS_PASSWORD}
+    depends_on:
+      - mongo1
+      - mongo2
+      - mongo3
+      - mongo-setup
+    ports:
+      - "8080:8081"
+    networks:
+      - tutorials
+
+volumes:
+  mongo-1-data:
+  mongo-2-data:
+  mongo-3-data:
+
+networks:
+  tutorials:
+    external: true

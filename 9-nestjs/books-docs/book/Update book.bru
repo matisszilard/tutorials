@@ -1,0 +1,19 @@
+meta {
+  name: Update book
+  type: http
+  seq: 2
+}
+
+put {
+  url: http://localhost:3000/api/v1/books/2
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "title": "Lord of the rings",
+    "author": "J. R. R. Tolkien",
+    "year": "2024"
+  }
+}
