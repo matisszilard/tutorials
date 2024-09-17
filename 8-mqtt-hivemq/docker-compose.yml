@@ -1,0 +1,51 @@
+services:
+  hivemq:
+    image: hivemq/hivemq-ce
+    container_name: hivemq-ce
+    environment:
+      - HIVEMQ_LOG_LEVEL=DEBUG
+    ports:
+      - "1883:1883"
+      - "9399:9399"
+    volumes:
+      - ./hivemq-prometheus-extension:/opt/hivemq/extensions/hivemq-prometheus-extension
+      - ./hivemq-file-rbac-extension:/opt/hivemq/extensions/hivemq-file-rbac-extension
+    secrets:
+      - source: credentials
+        target: /opt/hivemq/extensions/hivemq-file-rbac-extension/credentials.xml
+    networks:
+      - tutorials
+
+  grafana:
+    container_name: grafana
+    image: grafana/grafana:8.0.0
+    depends_on:
+      - "prometheus"
+    ports:
+      - 3000:3000
+    volumes:
+      - grafanadata:/var/lib/grafana
+      - ./provisioning/:/etc/grafana/provisioning/
+      - ./dashboards/hivemq-v2.json:/var/lib/grafana/dashboards/hivemq-v2.json
+    networks:
+      - tutorials
+
+  prometheus:
+    container_name: prometheus
+    image: prom/prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    networks:
+      - tutorials
+
+volumes:
+  grafanadata: {}
+
+networks:
+  tutorials:
+
+secrets:
+  credentials:
+    file: ./hivemq-file-rbac-extension/credentials.xml
